@@ -29,7 +29,6 @@ class Session():
         def getAuthHeader(self):
                 return self.auth_header
 
-
 class Cluster():
 
         def __init__(self,ip,Session):
@@ -60,7 +59,6 @@ class Cluster():
 
         def getCluster(self):
                 return self.getApi("/cluster/me").json()
-
 
         def getClusterBootstrap(self):
                 return self.getApi("/cluster/me/bootstrap").json()
@@ -166,7 +164,7 @@ class Disk():
                 self.id = id
                 self.status = status
                 self.isEncrypted = isEncrypted
-                self.diskType = diskType
+                self.type = diskType
                 self.nodeId = nodeId
                 self.capacityBytes = capacityBytes
                 self.path = path
@@ -200,3 +198,42 @@ class SlaDomain():
                 self.name = name
                 self.numVms = 0
                 self.vmList = vmlist
+
+class User():
+        def __init__(self,userName,firstName,authDomainId,isAdmin,role,lastName,emailAddress,id):
+                self._userName = userName
+                self._firstName = firstName
+                self._authDomainId = authDomainId
+                self._isAdmin = isAdmin
+                self._role = role
+                self._lastName = lastName
+                self._emailAddress = emailAddress
+                self._id = id
+
+        def getUserName(self):
+                return self._userName
+
+        def getFirstName(self):
+                return self._firstName
+
+        def getAuthDomainId(self):
+                return self._authDomainId
+
+        def getIsAdmin(self):
+                return self._isAdmin
+
+        def getRole(self):
+                return self._role
+
+        def getLastName(self):
+                return self._lastName
+
+        def getEmailAddress(self):
+                return self._emailAddress
+
+        def getId(self):
+                return self._id
+
+# Create a Session object with rubrik credentials
+# Create a Cluster object with ip of the cluster and the belonging session object
+# Call the auth method of the Cluster object
