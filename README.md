@@ -6,9 +6,10 @@ The rubrik_wrapper.py is a simple wrapper to the Rubrik API , used by functions 
 The rubrik.py contains functions to ease the usage of rubrik API 
 
 
-How to connect to your rubrik with python
+# How to connect to your rubrik with python
 
 
+``` python
 #import the rubrik.py files
 import rubrik
 
@@ -21,6 +22,7 @@ rubrik_test = Cluster("127.0.0.1",mySession)
 #Call the auth() method of the Cluster object
 rubrik_test.auth()
 
+``` 
 That's all, you must be connected to your rubrik in just 4 lines of python 
 
 
