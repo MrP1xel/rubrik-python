@@ -19,11 +19,17 @@ mySession = Session("admin","mmmm")
 #Create a Cluster object with the IP of your rubrik and the Session object created just above
 rubrik_test = Cluster("127.0.0.1",mySession)
 
-#Call the auth() method of the Cluster object
-rubrik_test.auth()
+#Main loop of your script
+#The .auth() method return True if connection is OK, else False
+
+if rubrik_test.auth():
+  print getVersion(Cluster)
+else:
+  print "connection issue"
+
 
 ``` 
-That's all, you must be connected to your rubrik in just 4 lines of python 
+That's all, you must be connected to your rubrik in just 3 lines of python 
 
 
 
