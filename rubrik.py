@@ -1,6 +1,6 @@
 from rubrik_wrapper import *
 
-#About user
+
 def get_all_users(Cluster):
         user_list = []
         for user in Cluster.get_user():
@@ -36,3 +36,21 @@ def getDiskCapacity(Cluster):
 
 def getDnsServer(Cluster):
         return Cluster.get_cluster_dns_nameserver()["data"]
+
+def getDnsSearchDomain(Cluster):
+        return Cluster.get_cluster_dns_search_domain()["data"]
+
+def getFlashCapacity(Cluster):
+        return Cluster.get_cluster_flash_capacity()["bytes"]
+
+def getName(Cluster):
+        return Cluster.get_cluster_name()
+
+def getMemoryCapacity(Cluster):
+        return Cluster.get_cluster_memory_capacity()["bytes"]
+
+def getNodeList(Cluster):
+        node_list = []
+        for node in Cluster.get_cluster_node()["data"]:
+                node_list.append(Node(node["id"],node["brikId"],node["status"],node["ipAddress"],node["needsInspection"]))
+        return node_list
