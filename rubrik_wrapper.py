@@ -1,3 +1,14 @@
+#############################################
+## Rubrik wrapper by MrP1xel
+## First published on 21th of november 2017
+##
+## You can find me on twitter @Mr_P1xel
+## Or by email : jerome at miski.fr
+##
+## Rubrik api version : v1
+## License : GNU
+#############################################
+
 import json
 import requests
 import base64
