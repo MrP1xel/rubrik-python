@@ -38,6 +38,8 @@ class Cluster():
                 self.login_url_end = "/login"
                 self.login_url = self.api_url + self.login_url_end
                 self.session = Session
+                self.isConnected = False
+                self.session = Session
 
         def auth(self):
                 login_header={'Accept':'application/json'}
@@ -49,13 +51,25 @@ class Cluster():
                         Session.token = (r.json().get('token'))
                         Session.token_b64 = base64.b64encode(bytes(Session.token))
                         Session.auth_header = {"Authorization": "Basic " + Session.token_b64.decode("utf-8")}
+                        Session.isConnected = True
+                        return Session.isConnected
 
                 else:
                         if r.status_code == 400:
                                 print "The connection request is malformated"
+                                Session.isConnected = False
+                                return Session.isConnected
+
+                        else:
+
+                                if r.status_code == 422:
+                                        print "The credentials are incorrect"
+                                        Session.isConnected = False
+                                        return Session.isConnected
+
 
         def getApi(self,url):
-                return requests.get(self.api_url + url,verify=False,headers=self.session.getAuthHeader())
+                return requests.get(self.api_url + url,verify=False,headers=Session.auth_header)
 
         def getCluster(self):
                 return self.getApi("/cluster/me").json()
@@ -233,7 +247,3 @@ class User():
 
         def getId(self):
                 return self._id
-
-# Create a Session object with rubrik credentials
-# Create a Cluster object with ip of the cluster and the belonging session object
-# Call the auth method of the Cluster object
