@@ -1,14 +1,3 @@
-#############################################
-## Rubrik wrapper by MrP1xel
-## First published on 21th of november 2017
-##
-## You can find me on twitter @Mr_P1xel
-## Or by email : jerome at miski.fr
-##
-## Rubrik api version : v1
-## License : GNU
-#############################################
-
 import json
 import requests
 import base64
@@ -16,213 +5,75 @@ from pprint import pprint
 from requests.auth import HTTPBasicAuth
 requests.packages.urllib3.disable_warnings()
 
-
 class Session():
-        def __init__(self,username,password):
+        LOGIN_HEADER = {'Accept':'application/json'}
+        API_VERSION_ENDPOINT = "/api/v1"
+        LOGIN_ENDPOINT = "/login"
+
+        def __init__(self,username,password,ip):
                 self.username = username
-                self.password = password
-
-        def getUsername(self):
-                return self.username
-
-        def getPassword(self):
-                return self.password
-
-        def getUserId(self):
-                return self.userId
-
-        def getToken(self):
-                return self.token
-
-        def getTokenB64(self):
-                return self.token_b64
-
-        def getAuthHeader(self):
-                return self.auth_header
-
-class Cluster():
-
-        def __init__(self,ip,Session):
+                self._password = password
                 self.ip = ip
-                self.url = "https://" + self.ip
-                self.api_url = self.url + "/api/v1"
-                self.login_url_end = "/login"
-                self.login_url = self.api_url + self.login_url_end
-                self.session = Session
-                self.isConnected = False
-                self.session = Session
+                self.login_url = "https://" + self.ip + Session.API_VERSION_ENDPOINT + Session.LOGIN_ENDPOINT
 
         def auth(self):
-                login_header={'Accept':'application/json'}
-                userdata = "{" + "\"username\":\""+self.session.getUsername()+"\",\"password\":\""+self.session.password+"\"}"
-                r = requests.post(self.login_url,headers=login_header,data=userdata,verify=False)
-                if r.status_code == 200:
-                        print "Connection OK"
-                        Session.userId = (r.json().get('userId'))
-                        Session.token = (r.json().get('token'))
-                        Session.token_b64 = base64.b64encode(bytes(Session.token))
-                        Session.auth_header = {"Authorization": "Basic " + Session.token_b64.decode("utf-8")}
-                        Session.isConnected = True
-                        return Session.isConnected
+                self._userdata = "{" + "\"username\":\""+ self.username+"\",\"password\":\""+ self._password+"\"}"
+                r_auth = requests.post(self.login_url,headers=Session.LOGIN_HEADER,data=self._userdata,verify=False)
+
+                if r_auth.status_code == 200:
+                        print "connection OK"
+                        self._userId = (r_auth.json().get('userId'))
+                        self._token = (r_auth.json().get('token'))
+                        self._token_b64 = base64.b64encode(bytes(self._token))
+                        self._auth_header = {"Authorization": "Basic " + self._token_b64.decode("utf-8")}
+                        self._isConnected = True
+                        return self._isConnected
 
                 else:
-                        if r.status_code == 400:
+                        if r_auth.status_code == 400:
                                 print "The connection request is malformated"
-                                Session.isConnected = False
-                                return Session.isConnected
-
+                                self._isConnected = False
+                                return self._isConnected
                         else:
-
-                                if r.status_code == 422:
+                                if r_auth.status_code == 422:
                                         print "The credentials are incorrect"
-                                        Session.isConnected = False
-                                        return Session.isConnected
+                                        self._isConnected = False
+                                        return self._isConnected
+
+        #API MAPPING
+
+        CLUSTER_ID = "/cluster/me"
+        CLUSTER_ID_BOOTSTRAP = "/cluster/me/bootstrap"
+        CLUSTER_ID_BRIK_COUNT = "/cluster/me/brik_count"
+        CLUSTER_ID_DECOMMISSION_NODE = "/cluster/me/decommission_node"
+        CLUSTER_ID_DISCOVER = "/cluster/me/discover"
+        CLUSTER_ID_DISK = "/cluster/me/disk"
+        CLUSTER_ID_DISK_CAPACITY = "/cluster/me/disk_capacity"
+        CLUSTER_ID_DNS_NAMESERVER = "/cluster/me/dns_nameserver"
+        CLUSTER_ID_DNS_SEARCH_DOMAIN = "/cluster/me/dns_search_domain"
+        CLUSTER_ID_FLASH_CAPACITY = "/cluster/me/flash_capacity"
+        CLUSTER_ID_IO_STATS = "/cluster/me/io_stats"
+        CLUSTER_ID_IS_SINGLE_NODE = "/cluster/me/is_single_node"
+        CLUSTER_ID__NAME = "/cluster/me/name"
+        CLUSTER_ID_MEMORY_CAPACITY = "/cluster/me/memory_capacity"
+        CLUSTER_ID_NODE = "/cluster/me/node"
+        CLUSTER_ID_NTP_SERVER = "/cluster/me/ntp_server"
+        CLUSTER_ID_VERSION = "/cluster/me/version"
+        CLUSTER_ID_VLAN = "/cluster/me/vlan"
+        CLUSTER_ID_SLA_DOMAIN = "/cluster/me/sla_domain"
+        CLUSTER_ID_SLA_DOMAIN_ID = "/cluster/me/sla_domain"
+        USER = "/user"
+        USER_NOTIFICATION = "/user_notification"
+        VCENTER = "/vmware/vcenter"
+        VIRTUAL_DISK = "/vmware/virtual_disk"
 
 
-        def getApi(self,url):
-                return requests.get(self.api_url + url,verify=False,headers=Session.auth_header)
+        def _getApi(self,api_endpoint):
+                return requests.get("https://" + self.ip + Session.API_VERSION_ENDPOINT + api_endpoint, verify=False,headers=self._auth_header).json()
 
-        def getCluster(self):
-                return self.getApi("/cluster/me").json()
+        def _getApiWithId(self,api_endpoint,id):
+                return requests.get("https://" + self.ip + Session.API_VERSION_ENDPOINT + api_endpoint +"/"+id,verify=False,headers=self._auth_header).json()
 
-        def getClusterBootstrap(self):
-                return self.getApi("/cluster/me/bootstrap").json()
-
-        def get_cluster_brik_count(self):
-                return self.getApi("/cluster/me/brik_count").json()
-
-        def get_cluster_decommission_node(self):
-                return self.getApi("/cluster/me/decommission_node").json()
-
-        def get_cluster_discover(self):
-                return self.getApi("/cluster/me/discover").json()
-
-        def get_cluster_disk(self):
-                return self.getApi("/cluster/me/disk").json()
-
-        def get_cluster_disk_capacity(self):
-                return self.getApi("/cluster/me/disk_capacity").json()
-
-        def get_cluster_dns_nameserver(self):
-                return self.getApi("/cluster/me/dns_nameserver").json()
-
-        def get_cluster_dns_search_domain(self):
-                return self.getApi("/cluster/me/dns_search_domain").json()
-
-        def get_cluster_flash_capacity(self):
-                return self.getApi("/cluster/me/flash_capacity").json()
-
-        def get_cluster_io_stats(self):
-                return self.getApi("/cluster/me/io_stats").json()
-
-
-        def get_cluster_is_single_node(self):
-                return self.getApi("/cluster/me/is_single_node").json()
-
-        def get_cluster_name(self):
-                return self.getApi("/cluster/me/name").json()
-
-        def get_cluster_memory_capacity(self):
-                return self.getApi("/cluster/me/memory_capacity").json()
-
-        def get_cluster_node(self):
-                return self.getApi("/cluster/me/node").json()
-
-        def get_cluster_ntp_server(self):
-                return self.getApi("/cluster/me/ntp_server").json()
-
-        def get_cluster_version(self):
-                return self.getApi("/cluster/me/version").json()
-
-        def get_cluster_vlan(self):
-                return self.getApi("/cluster/me/vlan").json()
-
-        def get_sla_domain(self):
-                return self.getApi("/sla_domain").json()["data"]
-
-        def get_sla_domain_id(self,id):
-                return self.getApi("/sla_domain/" + id).json()["data"]
-
-
-        def get_user(self):
-                return self.getApi("/user").json()
-
-        def get_user_notification(self):
-                return self.getApi("/user_notification").json()
-
-        def get_vcenter(self):
-                return self.getApi("/vmware/vcenter").json()
-
-
-        def get_virtual_disk(self):
-                return self.getApi("/vmware/virtual_disk").json()
-
-
-        def get_virtual_disk_id(self,id):
-                return self.getApi("/vmware/virtual_disk/" + id).json()
-
-
-        def get_vm(self):
-                r = requests.get(self.api_url+'/vmware/vm',verify=False,headers=self.session.getAuthHeader())
-                total =  r.json()["total"]
-                payload = {}
-                payload["limit"] = total
-                r = requests.get(self.api_url+'/vmware/vm',verify=False,params=payload,headers=self.session.getAuthHeader())
-                return r.json()
-
-        def get_vm_id(self,id):
-                return self.getApi("/vmware/vm/" + id).json()
-
-
-        def get_vm_id_snapshot(self,id):
-                return self.getApi("/vmware/vm/"+ id +"/snapshot").json()
-
-        def get_vm_count(self):
-                return self.getApi("/vmware/vm/count").json()
-
-        def get_vm_credential_failure(self):
-                return self.getApi("/vmware/vm/credential_failure").json()
-
-
-class Disk():
-        def __init__(self,id,status,isEncrypted,diskType,nodeId,capacityBytes,path,unallocatedBytes,usableBytes):
-                self.id = id
-                self.status = status
-                self.isEncrypted = isEncrypted
-                self.type = diskType
-                self.nodeId = nodeId
-                self.capacityBytes = capacityBytes
-                self.path = path
-                self.uanllocatedBytes = unallocatedBytes
-                self.usableBytes = usableBytes
-
-
-class Node():
-        def __init__(self,id,brikId,status,ipAddress,needsInspection):
-                self.id = id
-                self.brikId = brikId
-                self.status = status
-                self.ipAddress = ipAddress
-                self.needsInspection = needsInspection
-
-
-class Vm():
-        def __init__(self,id,managedId,moid,name,vcenterId,hostname,hostid,powerstatus):
-                self.id = id
-                self.managedId = managedId
-                self.moid = moid
-                self.name = name
-                self.vcenterId = vcenterId
-                self.hostname = hostname
-                self.hostId = hostid
-                self.powerStatus = powerstatus
-
-class SlaDomain():
-        def __init__(self,id,name,vmlist):
-                self.id = id
-                self.name = name
-                self.numVms = 0
-                self.vmList = vmlist
 
 class User():
         def __init__(self,userName,firstName,authDomainId,isAdmin,role,lastName,emailAddress,id):
@@ -239,7 +90,7 @@ class User():
                 return self._userName
 
         def getFirstName(self):
-                return self._firstName
+                return self._fistName
 
         def getAuthDomainId(self):
                 return self._authDomainId
