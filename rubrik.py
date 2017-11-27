@@ -1,4 +1,4 @@
-from rubrik_w2 import *
+from rubrik_wrapper import *
 
 
 def getVersion(Session):
