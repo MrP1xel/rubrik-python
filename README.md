@@ -20,8 +20,8 @@ mySession = Session("admin","mmmm",IP_of_rubrik)
 #Main loop of your script
 #The .auth() method return True if connection is OK, else False
 
-if rubrik_test.auth():
-  print getVersion(Cluster)
+if mySession.auth():
+  print getVersion(mySession)
 else:
   print "connection issue"
 
