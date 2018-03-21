@@ -11,7 +11,7 @@ The rubrik.py contains functions to ease the usage of rubrik API
 
 ``` python
 #import the rubrik.py files
-import rubrik
+from rubrik import *
 
 #create a Session object with your rubrik credentials and the IP
 mySession = Session("admin","mmmm",IP_of_rubrik)
