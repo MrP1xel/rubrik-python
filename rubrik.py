@@ -1,15 +1,30 @@
 from rubrik_wrapper import *
 
 
-def getVersion(Session):
-        return Session._getApi(Session.CLUSTER_ID_VERSION)
+#def getClusterVersion(Session):
+#        return Session._getApi(Session.CLUSTER_ID_VERSION)
 
-def getBrikCount(Session):
-        return Session._getApi(Session.CLUSTER_ID_BRIK_COUNT)["count"]
+#def getClusterBrikCount(Session):
+#        return Session._getApi(Session.CLUSTER_ID_BRIK_COUNT)["count"]
+
+def getClusterDiskCapacity(Session):
+	return Session._getApi(Session.CLUSTER_ID_DISK_CAPACITY)
+
+def getClusterDnsNameServer(Session):
+	return Session._getApi(Session.CLUSTER_ID_DNS_NAMESERVER)
 
 def getVirtualDisk(Session):
         for disk in Session._getApi(Session.VIRTUAL_DISK)["data"]:
                 print disk
+
+def getClusterName(Session):
+	return Session._getApi(Session.CLUSTER_ID__NAME)
+
+def getClusterBoostrap(Session):
+	return Session._getApi(Session.CLUSTER_ID_BOOTSTRAP)
+
+def getClusterMemoryCapacity(Session):
+	return Session._getApi(Session.CLUSTER_ID_MEMORY_CAPACITY)
 
 def getUserList(Session):
         user_list = []
